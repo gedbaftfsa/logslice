@@ -24,3 +24,14 @@ n, err := p.Run()
 - Skips entries that do not match the provided filter (pass `nil` to disable filtering).
 - Writes matching entries through the configured `output.Writer`.
 - Returns the count of written entries and the first non-EOF error encountered.
+- Malformed JSON lines are skipped and counted separately; they do not cause `Run` to abort.
+
+## Error Handling
+
+`Run` distinguishes between three categories of error:
+
+| Situation | Behaviour |
+|---|---|
+| `io.EOF` on the source reader | Normal termination; not returned as an error |
+| Malformed JSON on a line | Line is skipped; parse error is not propagated |
+| Write failure on the output writer | `Run` aborts immediately and returns the error |
