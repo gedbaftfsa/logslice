@@ -16,13 +16,14 @@ After log entries are read from a source and matched against a filter, the `outp
 
 ## Field Selection
 
-You can limit the output to specific fields by passing a non-empty `fields` slice to `NewWriter`. Only those keys will appear in the output.
+You can limit the output to specific fields by passing a non-empty `fields` slice to `NewWriter`. Only those keys will appear in the output. If `fields` is empty or nil, all fields are included.
 
 ## Usage
 
 ```go
 import "github.com/yourorg/logslice/internal/output"
 
+// Write compact JSON with only selected fields
 w := output.NewWriter(os.Stdout, output.FormatJSON, []string{"level", "message"})
 
 entry := map[string]any{
@@ -36,3 +37,23 @@ if err := w.Write(entry); err != nil {
 }
 // Output: {"level":"error","message":"disk full"}
 ```
+
+## Writing Multiple Entries
+
+Call `Write` once per entry. Each call emits exactly one line (or block, for `pretty` format):
+
+```go
+for _, entry := range entries {
+    if err := w.Write(entry); err != nil {
+        log.Fatal(err)
+    }
+}
+```
+
+## Format Constants
+
+| Constant            | Value      |
+|---------------------|------------|
+| `output.FormatJSON`   | `"json"`   |
+| `output.FormatPretty` | `"pretty"` |
+| `output.FormatText`   | `"text"`   |
