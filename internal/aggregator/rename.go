@@ -63,3 +63,11 @@ func (r *Rename) Reset() {
 	r.results = r.results[:0]
 	r.mu.Unlock()
 }
+
+// AddMapping adds or updates a field rename rule.
+// If oldKey already exists in the mapping, its target is overwritten.
+func (r *Rename) AddMapping(oldKey, newKey string) {
+	r.mu.Lock()
+	r.mapping[oldKey] = newKey
+	r.mu.Unlock()
+}
