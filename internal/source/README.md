@@ -22,6 +22,10 @@ Opens a file at the given path and returns a source for it. Returns an error if 
 
 Returns a source that reads from `os.Stdin`.
 
+### `NewMultiSource(sources ...Source) Source`
+
+Combines multiple sources into a single source. Lines from all sources are merged into one channel. Useful for tailing several log files simultaneously.
+
 ## Usage
 
 ```go
@@ -31,6 +35,17 @@ if err != nil {
 }
 
 for line := range src.Lines() {
+    fmt.Println(line)
+}
+```
+
+To read from multiple files at once:
+
+```go
+src1, _ := source.NewFileSource("/var/log/app.log")
+src2, _ := source.NewFileSource("/var/log/app-error.log")
+
+for line := range source.NewMultiSource(src1, src2).Lines() {
     fmt.Println(line)
 }
 ```
